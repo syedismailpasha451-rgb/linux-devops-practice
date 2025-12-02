@@ -1,73 +1,216 @@
-```bash
-linux-server-automation/
-├── README.md
-│
-├── ROADMAP/
-│   ├── LEVEL_1_BASIC.md
-│   ├── LEVEL_2_INTERMEDIATE.md
-│   ├── LEVEL_3_ADVANCED.md
-│   └── FULL_ROADMAP.md
-│
-├── scripts/
-│   ├── FULL_PROCEDURE.sh
-│   ├── install_packages.sh
-│   ├── backup_myapp.sh
-│   ├── cleanup_logs.sh
-│   ├── health_check.sh
-│   ├── restart_myapp.sh
-│   └── utils/
-│       ├── colors.sh
-│       └── notifications.sh
-│
-├── systemd/
-│   └── myapp.service
-│
-├── logrotate/
-│   └── myapp
-│
-├── cron/
-│   ├── backup_cron.txt
-│   ├── cleanup_cron.txt
-│   └── healthcheck_cron.txt
-│
-├── ssh/
-│   ├── sshd_hardening.md
-│   └── fail2ban_setup.md
-│
-├── firewall/
-│   ├── ufw_rules.md
-│   └── iptables_rules.md
-│
-├── lvm/
-│   ├── lvm_setup.md
-│   └── lvm_extend_volume.md
-│
-├── monitoring/
-│   ├── top_commands.md
-│   ├── log_monitoring.md
-│   └── system_audit.md
-│
-├── networking/
-│   ├── linux_network_basics.md
-│   └── troubleshooting.md
-│
-├── security/
-│   ├── permissions_guide.md
-│   └── audit_scripts.sh
-│
-├── assets/
-│   ├── diagrams.png
-│   ├── lvm_architecture.png
-│   └── systemd_flow.png
-│
-└── examples/
-    ├── nginx/
-    │   └── nginx.conf
-    ├── apache/
-    │   └── httpd.conf
-    └── sample_logs/
-        └── myapp.log
-```
+**🟦 LEVEL–1 BASIC FILES**
+📄 level-1-basic/user-management/create_users.sh
+#!/bin/bash
+
+groupadd devteam
+
+useradd -m -s /bin/bash -G devteam dev1
+echo "dev1:DevPass123" | chpasswd
+
+useradd -m -s /bin/bash -G devteam dev2
+echo "dev2:DevPass123" | chpasswd
+
+echo "Users and group created successfully."
+
+
+📄 level-1-basic/user-management/permissions.sh
+
+
+#!/bin/bash
+
+mkdir -p /opt/myapp
+chown :devteam /opt/myapp
+chmod 770 /opt/myapp
+
+echo "Permissions updated for /opt/myapp"
+
+📄 level-1-basic/package-installation/install_packages.sh
+#!/bin/bash
+
+apt update
+apt install -y git nginx default-jdk
+
+echo "Packages installed: git, nginx, java"
+
+📄 level-1-basic/system-info/system_info.sh
+#!/bin/bash
+
+echo "CPU Info:"
+lscpu
+
+echo "Memory:"
+free -h
+
+echo "Disk Storage:"
+df -h
+
+echo "OS Version:"
+cat /etc/os-release
+
+📄 level-1-basic/README.md
+# Level 1 – Basic Linux Tasks
+
+This section covers foundational Linux administration tasks:
+- User & group creation
+- File/directory permissions
+- Installing packages
+- Checking system information
+
+🟩 LEVEL–2 INTERMEDIATE FILES
+📄 level-2-intermediate/cron-backups/backup_script.sh
+#!/bin/bash
+
+tar -czf /opt/myapp_backup_$(date +%F).tar.gz /opt/myapp
+
+echo "Backup created in /opt"
+
+📄 level-2-intermediate/shell-scripts/log_cleanup.sh
+#!/bin/bash
+
+find /var/log -type f -name "*.log" -mtime +7 -exec rm -f {} \;
+
+echo "Old logs cleaned successfully."
+
+📄 level-2-intermediate/shell-scripts/restart_service.sh
+#!/bin/bash
+
+systemctl restart nginx
+systemctl status nginx
+
+📄 level-2-intermediate/shell-scripts/health_check.sh
+#!/bin/bash
+
+curl -I http://localhost
+
+📄 level-2-intermediate/log-management/log_commands.txt
+ls -lh /var/log
+tail -f /var/log/syslog
+tail -f /var/log/nginx/access.log
+tail -f /var/log/nginx/error.log
+
+📄 level-2-intermediate/system-monitoring/monitoring_commands.txt
+top
+htop
+vmstat 1
+iostat
+ss -tulnp
+journalctl -u nginx
+
+📄 level-2-intermediate/README.md
+# Level 2 – Intermediate DevOps Tasks
+
+Includes:
+- Cron backups
+- Shell scripts for automation
+- Log management
+- Monitoring Linux servers
+
+🟥 LEVEL–3 ADVANCED FILES
+📄 level-3-advanced/systemd-service/myapp.service
+[Unit]
+Description=My Java Application
+After=network.target
+
+[Service]
+User=root
+ExecStart=/usr/bin/java -jar /opt/myapp/app.jar
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+📄 level-3-advanced/ssh-hardening/ssh_config_hardening.txt
+PermitRootLogin no
+PasswordAuthentication no
+AllowUsers dev1 dev2
+
+📄 level-3-advanced/lvm-setup/lvm_commands.txt
+pvcreate /dev/sdb
+vgcreate data_vg /dev/sdb
+lvcreate -L 5G -n app_lv data_vg
+mkfs.ext4 /dev/data_vg/app_lv
+mkdir /mnt/appdata
+mount /dev/data_vg/app_lv /mnt/appdata
+
+📄 level-3-advanced/firewall-setup/firewall_rules.txt
+ufw allow 22
+ufw allow 80
+ufw allow 443
+ufw enable
+ufw status
+
+📄 level-3-advanced/logrotate/myapp_logrotate.conf
+/opt/myapp/logs/*.log {
+    daily
+    rotate 7
+    compress
+    notifempty
+    missingok
+}
+
+📄 level-3-advanced/README.md
+# Level 3 – Advanced Linux Administration
+
+Production-level tasks:
+- Systemd service
+- SSH hardening
+- LVM
+- Firewall
+- Logrotate
+
+🟦 ALL-IN-ONE INSTALLATION SCRIPT
+📄 scripts/all-in-one-setup.sh
+#!/bin/bash
+
+echo "Creating users..."
+groupadd devteam
+useradd -m -s /bin/bash -G devteam dev1
+useradd -m -s /bin/bash -G devteam dev2
+
+echo "Setting up directory..."
+mkdir -p /opt/myapp
+chown :devteam /opt/myapp
+chmod 770 /opt/myapp
+
+echo "Installing packages..."
+apt update
+apt install -y git nginx default-jdk
+
+echo "Setup completed successfully."
+
+📄 scripts/README.md
+# Automation Scripts
+
+This folder contains full server setup automation scripts.
+
+🏆 MAIN README.md
+📄 README.md
+# Linux DevOps Practice – Server Automation
+
+This repository contains full Linux automation tasks used in real-world DevOps projects.
+
+## Levels Covered
+
+### ✔️ Level 1 – Basic  
+- User management  
+- Permissions  
+- Package installation  
+- System information  
+
+### ✔️ Level 2 – Intermediate  
+- Cron backups  
+- Shell scripting  
+- Log management  
+- Server monitoring  
+
+### ✔️ Level 3 – Advanced  
+- Systemd services  
+- SSH hardening  
+- LVM management  
+- Firewall rules  
+- Logrotate  
+
+🎉 DONE!
 
 
 
