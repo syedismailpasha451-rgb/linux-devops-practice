@@ -182,7 +182,249 @@ This is the standard way to run services in production.”
 
 
 
+🚀 Next Step
 
+If you want, I can also create:
+
+✅ Each LEVEL_x.md file content
+✅ Full automation bash scripts
+✅ A complete FULL_ROADMAP.md
+✅ A professional GitHub project description
+
+Just say: “Create all roadmap files” or “Create bash scripts also”.
+
+You said:
+create a bash scripts also
+ChatGPT said:
+
+Perfect, Syed!
+Below are production-ready Bash automation scripts for your repository.
+These match your Level 1 → Level 3 roadmap and are written clean, professional, and fully executable.
+
+You can copy each script into your:
+
+linux-devops-practice/scripts/
+
+✅ 1. install_packages.sh
+
+Installs Git, Nginx, Java, updates system.
+
+#!/bin/bash
+
+set -e
+
+echo "🔄 Updating system..."
+sudo apt update -y
+
+echo "📦 Installing packages: git, nginx, openjdk-17..."
+sudo apt install -y git nginx openjdk-17-jdk
+
+echo "✔️ Packages installed successfully."
+
+✅ 2. set_users_groups.sh
+
+Creates DevOps users + group and sets permissions.
+
+#!/bin/bash
+
+set -e
+
+GROUP="devteam"
+USERS=("dev1" "dev2" "dev3")
+
+echo "👥 Creating group: $GROUP"
+sudo groupadd -f $GROUP
+
+echo "👤 Creating users & adding to group..."
+for user in "${USERS[@]}"; do
+    if id "$user" &>/dev/null; then
+        echo "User $user already exists."
+    else
+        sudo useradd -m -s /bin/bash -G $GROUP $user
+        echo "User $user created."
+    fi
+done
+
+echo "📁 Setting project permissions..."
+sudo mkdir -p /project/app
+sudo chown -R :$GROUP /project/app
+sudo chmod -R 2775 /project/app
+
+echo "✔️ Users, groups & permissions completed."
+
+✅ 3. backup_cron.sh
+
+Automates daily backup using cron job.
+
+#!/bin/bash
+
+set -e
+
+SOURCE="/project/app"
+BACKUP="/backup/app_$(date +%F).tar.gz"
+
+echo "📦 Taking backup..."
+sudo tar -czf $BACKUP $SOURCE
+
+echo "Backup created at: $BACKUP"
+
+echo "⏰ Setting cron job for daily backups..."
+CRON_JOB="0 2 * * * tar -czf /backup/app_\$(date +\%F).tar.gz /project/app"
+
+(crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
+
+echo "✔️ Daily backup cron configured."
+
+✅ 4. cleanup_logs.sh
+
+Deletes logs older than 7 days.
+
+#!/bin/bash
+
+set -e
+
+LOG_DIR="/var/log"
+DAYS=7
+
+echo "🧹 Cleaning logs older than $DAYS days in $LOG_DIR..."
+sudo find $LOG_DIR -type f -mtime +$DAYS -exec rm -f {} \;
+
+echo "✔️ Old logs cleaned."
+
+✅ 5. service_health_check.sh
+
+Checks if nginx, ssh, cron services are running.
+
+#!/bin/bash
+
+SERVICES=("nginx" "ssh" "cron")
+
+echo "⚕️ Checking system services..."
+
+for svc in "${SERVICES[@]}"; do
+    if systemctl is-active --quiet "$svc"; then
+        echo "✔️ $svc is running"
+    else
+        echo "❌ $svc is NOT running — restarting..."
+        sudo systemctl restart "$svc"
+    fi
+done
+
+✅ 6. create_systemd_service.sh
+
+Creates a custom systemd service.
+
+#!/bin/bash
+
+set -e
+
+SERVICE_NAME="myapp"
+APP_PATH="/project/app/start.sh"
+
+echo "⚙️ Creating systemd service: $SERVICE_NAME"
+
+sudo bash -c "cat > /etc/systemd/system/$SERVICE_NAME.service <<EOF
+[Unit]
+Description=My Custom App Service
+After=network.target
+
+[Service]
+ExecStart=$APP_PATH
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF"
+
+sudo systemctl daemon-reload
+sudo systemctl enable $SERVICE_NAME
+
+echo "✔️ systemd service created & enabled."
+
+✅ 7. harden_ssh.sh
+
+Secures SSH for production.
+
+#!/bin/bash
+
+set -e
+
+echo "🔐 Hardening SSH..."
+
+sudo sed -i 's/#PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+sudo systemctl restart sshd
+
+echo "✔️ SSH security applied."
+
+✅ 8. firewall_rules.sh
+
+Enables and configures UFW firewall.
+
+#!/bin/bash
+
+set -e
+
+echo "🔥 Configuring firewall rules..."
+
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+
+echo "✔️ Firewall configured."
+
+✅ 9. lvm_setup.sh
+
+Creates LVM physical volume → volume group → logical volume.
+
+#!/bin/bash
+
+set -e
+
+DISK="/dev/sdb"
+VG="vgdata"
+LV="lvdata"
+
+echo "💽 Creating physical volume..."
+sudo pvcreate $DISK
+
+echo "📦 Creating volume group: $VG"
+sudo vgcreate $VG $DISK
+
+echo "📏 Creating logical volume: $LV"
+sudo lvcreate -l 100%FREE -n $LV $VG
+
+echo "📂 Formatting & mounting..."
+sudo mkfs.ext4 /dev/$VG/$LV
+sudo mkdir -p /mnt/data
+sudo mount /dev/$VG/$LV /mnt/data
+
+echo "✔️ LVM setup completed."
+
+✅ 10. logrotate_app.sh
+
+Creates log rotation for your app.
+
+#!/bin/bash
+
+set -e
+
+echo "🔄 Setting up logrotate for app logs..."
+
+sudo bash -c "cat > /etc/logrotate.d/myapp <<EOF
+/project/app/logs/*.log {
+    daily
+    rotate 7
+    compress
+    missingok
+    notifempty
+}
+EOF"
+
+echo "✔️ Logrotate configured."
 
 
 
