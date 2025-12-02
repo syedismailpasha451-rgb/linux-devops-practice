@@ -5,19 +5,19 @@
 \## Update Package Index
 
 ```
-apt update
+yum update
 ```
 
 
 \## Install Git, Nginx, Java
 
 ```
-apt install -y git nginx openjdk-17-jdk
+yum install -y git nginx openjdk-17-jdk
 ```
 
 \## Check Versions
 ```
-git --version
+ --version
 ```
 
 ```
